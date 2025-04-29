@@ -1,0 +1,7 @@
+Decision Threshold: 0.25
+Ensemble Accuracy: 50.00%
+Ensemble AUC: 0.9156
+Ensemble F1 Score: 0.6667
+Ensemble Precision: 0.5000
+Ensemble Recall: 1.0000
+Date: 2025-04-24 18:41:22

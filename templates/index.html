@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deepfake Detector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.1/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.1/ScrollTrigger.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .custom-bg {
+      background-color: #1E3A8A;
+    }
+    .upload-box {
+      border: 2px dashed #D1D5DB;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+    }
+    .analysis-box {
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .section {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .bounce {
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md p-4 flex justify-between items-center sticky-nav">
+    <a href="#hero" class="text-xl font-bold text-blue-900 hover:text-blue-600">Deepfake Detector</a>
+    <div class="space-x-4">
+      <a href="#about" class="text-gray-600 hover:text-blue-600">About</a>
+      <a href="#how-it-works" class="text-gray-600 hover:text-blue-600">How It Works</a>
+      <a href="#team" class="text-gray-600 hover:text-blue-600">Team</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero" class="custom-bg text-white text-center py-16 section">
+    <h1 class="text-4xl font-bold mb-4">Detect Deepfakes with AI</h1>
+    <p class="text-lg mb-8">Verify the authenticity of images and videos with our state-of-the-art deepfake detection technology.</p>
+    <a href="#upload" class="bg-white text-blue-900 px-6 py-2 rounded-full font-semibold hover:bg-gray-200 bounce">Try Now</a>
+  </section>
+
+  <!-- Upload Section -->
+  <section id="upload" class="py-12 px-4 section">
+    <h2 class="text-2xl font-bold text-center mb-8">Upload Media for Analysis</h2>
+    <div class="max-w-5xl mx-auto bg-white p-10 rounded-lg shadow-md flex space-x-8">
+      <!-- Upload Area -->
+       
+       
+      <div class="w-1/2 upload-box flex flex-col items-center justify-center min-h-[28rem]">
+        <p class="text-gray-600 mb-4">Drop your file here</p>
+        <p class="text-sm text-gray-500 mb-4">Upload an image to analyze. Only JPG and PNG formats are supported (max 25MB).</p>
+        <input type="file" id="fileInput" class="hidden" accept="image/jpeg,image/png,video/mp4">
+        <button onclick="document.getElementById('fileInput').click()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 bounce">Select File</button>
+      </div>
+      <!-- Analysis Results -->
+      <div class="w-1/2 analysis-box flex flex-col justify-center min-h-[28rem]">
+        <h3 class="text-lg font-semibold mb-4">Analysis Results</h3>
+        <p class="text-gray-600 mb-2">Prediction: <span id="resultLabel" class="font-bold text-blue-700">-</span></p>
+        <p class="text-gray-600 mb-2">Confidence Score</p>
+        <div class="bg-gray-200 h-4 rounded-full mb-2">
+          <div id="confidenceBar" class="bg-green-500 h-4 rounded-full" style="width: 0%"></div>
+        </div>
+        <p id="confidenceText" class="text-sm text-gray-500 mb-4">0%</p>
+        <p class="text-sm text-gray-500 mb-4">The content shows signs of manipulation or AI generation.</p>
+        <button id="downloadPdfBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Download PDF Report</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-12 px-4 bg-gray-50 section">
+    <h2 class="text-2xl font-bold text-center mb-8">How It Works</h2>
+    <p class="text-center text-gray-600 mb-12">Our deepfake detection is simple yet powerful, leveraging state-of-the-art AI technology</p>
+    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <div class="text-blue-600 text-3xl mb-4">📤</div>
+        <h3 class="text-lg font-semibold mb-2">Upload</h3>
+        <p class="text-gray-600">Upload images or videos for analysis. We support various formats up to 100MB.</p>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <div class="text-blue-600 text-3xl mb-4">🤖</div>
+        <h3 class="text-lg font-semibold mb-2">AI Analysis</h3>
+        <p class="text-gray-600">Our ensemble of deep learning models analyzes the content for manipulation signs.</p>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <div class="text-blue-600 text-3xl mb-4">📊</div>
+        <h3 class="text-lg font-semibold mb-2">Results</h3>
+        <p class="text-gray-600">View the prediction (Real/Fake) along with a detailed confidence score and analysis.</p>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <div class="text-blue-600 text-3xl mb-4">📄</div>
+        <h3 class="text-lg font-semibold mb-2">Report</h3>
+        <p class="text-gray-600">Download a comprehensive PDF report with detailed findings for your records.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About the Project Section -->
+  <section id="about" class="py-12 px-4 section">
+    <h2 class="text-2xl font-bold text-center mb-8">About This Project</h2>
+    <p class="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+      Deepfake Detector is a modern web application designed to help users detect manipulated ("deepfake") images using state-of-the-art artificial intelligence. As deepfakes become more sophisticated, ensuring media integrity, security, and public trust is crucial.
+    </p>
+    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold mb-2">Why Deepfake Detection?</h3>
+        <p class="text-gray-600">Deepfakes can be used to spread misinformation and harm reputations. Our AI-powered detection tools verify the authenticity of digital content, ensuring a safer and more trustworthy online environment.</p>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold mb-2">Technology Stack</h3>
+        <p class="text-gray-600">Our solution uses Python, HTML, CSS, JavaScript for the frontend, and detection leverages deep learning models such as ResNet, EfficientNet, ConvNet, and Swin Transformer.</p>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold mb-2">Performance Metrics</h3>
+        <p class="text-gray-600">Achieved 94.7% accuracy in binary classification on benchmark datasets. The model uses 0.75M parameters, with inference time augmentation for optimal and fast results.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Meet the Team Section -->
+  <section id="team" class="py-12 px-4 bg-gray-50 section">
+    <h2 class="text-2xl font-bold text-center mb-8">Meet the Team</h2>
+    <p class="text-center text-gray-600 mb-12">Our talented team of AI researchers and developers who made this project possible</p>
+    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <img src="/static/vivek.png" alt="Bari Vivek Yadav" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-gray-300" />
+        <h3 class="text-lg font-semibold">Bari Vivek Yadav</h3>
+        <p class="text-gray-600"> Team Lead & Data Scientist</p>
+        <a href="https://www.linkedin.com/in/vivek-bari/" target="_blank" class="text-blue-600 hover:underline">LinkedIn</a>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <img src="/static/a_srinivas_kasyap.png" alt="A Srinivas Kasyap" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-gray-300" />
+        <h3 class="text-lg font-semibold">A Srinivas Kasyap</h3>
+        <p class="text-gray-600"> Machine Learning Engineer</p>
+        <a href="https://www.linkedin.com/in/a-srinivas-kasyap-kumar-7aa575242/" target="_blank" class="text-blue-600 hover:underline">LinkedIn</a>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <img src="/static/R Sai Sumanth.jpg" alt="R Sai Sumanth" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-gray-300" />
+        <h3 class="text-lg font-semibold">R Sai Sumanth</h3>
+        <p class="text-gray-600">Full Stack Developer</p>
+        <a href="https://www.linkedin.com/in/sai-sumanth-routhu/" target="_blank" class="text-blue-600 hover:underline">LinkedIn</a>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <img src="/static/mentor.png" alt="Mrudula Selokar" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-gray-300" />
+        <h3 class="text-lg font-semibold">Mrudula Selokar</h3>
+        <p class="text-gray-600">Mentor</p>
+        <a href="https://www.linkedin.com/in/mrudula-selokar-4a7387219/" target="_blank" class="text-blue-600 hover:underline">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-8 px-4">
+    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Deepfake Detector</h3>
+        <p class="text-gray-400">A web app designed to help detect deepfakes using state-of-the-art AI technologies.</p>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Links</h3>
+        <ul class="space-y-2">
+          <li><a href="#about" class="text-gray-400 hover:text-white">About</a></li>
+          <li><a href="#how-it-works" class="text-gray-400 hover:text-white">How It Works</a></li>
+          <li><a href="#team" class="text-gray-400 hover:text-white">Team</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Technology</h3>
+        <ul class="space-y-2">
+          <li><a href="#" class="text-gray-400 hover:text-white">Python</a></li>
+          <li><a href="#" class="text-gray-400 hover:text-white">Flask</a></li>
+          <li><a href="#" class="text-gray-400 hover:text-white">PyTorch</a></li>
+          <li><a href="#" class="text-gray-400 hover:text-white">React</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Connect</h3>
+        <ul class="space-y-2">
+          <li><a href="https://github.com/Vivekbari16/capstone" target="_blank" class="text-gray-400 hover:text-white">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="text-center text-gray-400 mt-8">© 2023 Deepfake Detector. All rights reserved.</p>
+  </footer>
+
+  <script>
+    let lastResult = '-';
+    let lastConfidence = '0%';
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        fetch('/analyze', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('resultLabel').textContent = '-';
+            document.getElementById('confidenceBar').style.width = '0%';
+            document.getElementById('confidenceText').textContent = '0%';
+            lastResult = '-';
+            lastConfidence = '0%';
+            alert(data.error);
+          } else {
+            document.getElementById('resultLabel').textContent = data.result;
+            document.getElementById('confidenceBar').style.width = data.confidence;
+            document.getElementById('confidenceText').textContent = data.confidence;
+            lastResult = data.result;
+            lastConfidence = data.confidence;
+          }
+        })
+        .catch(() => {
+          document.getElementById('resultLabel').textContent = '-';
+          document.getElementById('confidenceBar').style.width = '0%';
+          document.getElementById('confidenceText').textContent = '0%';
+          lastResult = '-';
+          lastConfidence = '0%';
+          alert('Error analyzing image.');
+        });
+      }
+    });
+
+    document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+      fetch('/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ result: lastResult, confidence: lastConfidence })
+      })
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'deepfake_report.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      });
+    });
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.utils.toArray('.section').forEach(section => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 80%',
+        onEnter: () => section.classList.add('visible'),
+        onEnterBack: () => section.classList.add('visible'),
+        onLeave: () => section.classList.remove('visible'),
+        onLeaveBack: () => section.classList.remove('visible')
+      });
+    });
+  </script>
+</body>
+</html>

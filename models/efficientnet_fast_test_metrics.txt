@@ -1,0 +1,6 @@
+Test Accuracy: 53.33%
+Test AUC: 0.5603
+Test F1: 0.6154
+Test Precision: 0.5437
+Test Recall: 0.7089
+Date: 2025-04-24 16:12:52

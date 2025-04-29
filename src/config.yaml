@@ -1,0 +1,35 @@
+# Configuration for DeepFake detection training
+
+# Model configuration
+model_type: "swin_transformer"  # Options: swin_transformer, coatnet, efficientnetv2, yolov10
+model_size: "tiny"  # Size depends on model_type
+num_classes: 2
+pretrained: true
+img_size: 224
+dropout: 0.2
+
+# Training configuration
+batch_size: 16
+num_epochs: 20
+lr: 1.0e-4
+weight_decay: 0.01
+optimizer_type: "adamw"  # Options: adam, adamw, sgd
+criterion_type: "focal"  # Options: cross_entropy, focal
+scheduler_type: "cosine"  # Options: cosine, one_cycle, none
+use_amp: true
+use_mixup: true
+mixup_alpha: 0.2
+patience: 5
+
+# Data configuration
+train_ratio: 0.7
+val_ratio: 0.15
+num_workers: 4
+
+# Hyperparameter tuning
+tune_hyperparams: false
+n_trials: 50
+
+# Ensemble configuration
+ensemble_type: "weighted"  # Options: weighted, voting
+voting: "soft"  # Options: hard, soft (only for voting ensemble)

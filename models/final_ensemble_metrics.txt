@@ -1,0 +1,6 @@
+Ensemble Accuracy: 86.50%
+Ensemble AUC: 0.0834
+Ensemble F1 Score: 0.8541
+Ensemble Precision: 0.9294
+Ensemble Recall: 0.7900
+Date: 2025-04-24 19:55:47
