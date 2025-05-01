@@ -5,7 +5,8 @@ from torchvision import transforms, models
 from PIL import Image
 import io, base64
 from flask import Flask, render_template, request, jsonify
-from final_ensemble import EfficientNetModel, CoAtNetModel, SwinTransformerModel, YOLOModel, FinalEnsemble, get_transforms, predict_image as ensemble_predict_image
+from final_ensemble import EfficientNetModel, CoAtNetModel, SwinTransformerModel, YOLOModel, FinalEnsemble
+from torchvision import transforms
 
 app = Flask(__name__)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -36,31 +37,36 @@ def load_ensemble():
     for m in [effnet, coatnet, swin, yolo]:
         m.to(device)
         m.eval()
-    weights = [0.9, 0.8, 0.6, 0.5]
+    weights = [1.5666666666666667, 1.0555555555555556, 0.4111111111111111, 0.9666666666666667]  # Optimized weights from quick_optimize.py
     ensemble_model = FinalEnsemble([effnet, coatnet, swin, yolo], weights=weights)
     ensemble_model.to(device)
     ensemble_model.eval()
-    ensemble_transform = get_transforms()
+    # Set optimal threshold if needed (FinalEnsemble should use 0.54 as mid_conf_threshold)
+    if hasattr(ensemble_model, 'mid_conf_threshold'):
+        ensemble_model.mid_conf_threshold = 0.54  # Optimal threshold
+
+    ensemble_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
     print("Ensemble model loaded successfully")
 
 def predict_image_ensemble(image):
-    # image is a PIL Image, preprocess and run through ensemble with TTA for robust prediction
+    # image is a PIL Image, preprocess and run through ensemble with consistent logic
     x = ensemble_transform(image).unsqueeze(0).to(device)
-    from final_ensemble import test_time_augmentation
     with torch.no_grad():
-        preds, probs = test_time_augmentation(ensemble_model, x, device, num_augments=3)
+        preds, probs = ensemble_model.predict(x)
         predicted = preds.item()
+        # Fix: If probs is a tuple, extract the tensor part
+        if isinstance(probs, tuple):
+            # Assume the first element is the probabilities tensor
+            probs = probs[0]
         confidence = probs[0][predicted].item()
         print('--- DEBUG ENSEMBLE OUTPUT ---')
         print(f'Ensemble probabilities: {probs}')
         print(f'Predicted label: {predicted} (0=Real, 1=Fake)')
         print(f'Confidence: {confidence}')
-        # Print individual model outputs for this image
-        if hasattr(ensemble_model, 'models'):
-            for idx, m in enumerate(ensemble_model.models):
-                out = m(x)
-                prob = torch.softmax(out, dim=1)
-                print(f'Model {idx} ({type(m).__name__}) probs: {prob}')
         print('-----------------------------')
     return predicted, confidence
 
