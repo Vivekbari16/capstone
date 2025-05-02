@@ -1,171 +1,145 @@
-# Enhanced DeepFake Detection System
+# Advanced DeepFake Detection System
 
-This repository contains a comprehensive DeepFake detection system that uses state-of-the-art deep learning models to identify manipulated images and videos. The system includes multiple advanced model architectures, optimized training pipelines, and tools for inference on both images and videos. Our enhanced system achieves 75-90% accuracy on DeepFake detection tasks.
+This repository contains a comprehensive DeepFake detection system that leverages an ensemble of state-of-the-art deep learning models to identify manipulated images with high accuracy. The system combines multiple advanced architectures (EfficientNet, CoAtNet, Swin Transformer, and YOLO) with optimized weights to achieve robust performance in detecting fake images.
+
+## Project Overview
+
+Our DeepFake detection system uses a weighted ensemble approach to combine the strengths of multiple deep learning architectures. The system achieves approximately 87% accuracy on test datasets, with high precision and recall metrics. The web interface allows users to upload images for analysis and receive detailed reports on the authenticity of the content.
 
 ## Project Structure
 
 ```
-├── data/
-│   ├── images/
-│   │   ├── real/       # Real face images
-│   │   └── fake/       # Fake face images (with easy, mid, hard categories)
-│   └── videos/         # Video files for testing
-├── models/             # Saved model weights
-├── results/            # Evaluation results and plots
-├── src/                # Source code
-│   ├── dataset.py      # Dataset classes and data loaders
-│   ├── inference.py    # Functions for inference on images and videos
-│   ├── models.py       # Model architectures
-│   ├── train.py        # Training functions
-│   └── utils.py        # Utility functions
-├── batch_image_detection.py    # Script for batch processing of images
-├── demo_app.py                 # GUI application for DeepFake detection
-├── model_comparison.py         # Script to compare different models
-├── train_difficulty_analysis.py # Analysis of model performance on different difficulty levels
-├── train_efficientnet.py       # Script to train EfficientNet model
-├── train_ensemble.py           # Script to create and evaluate ensemble model
-├── train_resnet.py             # Script to train ResNet model
-├── train_xception.py           # Script to train Xception model
-├── video_detection.py          # Script for DeepFake detection in videos
-└── README.md                   # This file
+├── app.py                      # Flask web application for DeepFake detection
+├── final_ensemble.py           # Ensemble model implementation with multiple architectures
+├── requirements.txt            # Python dependencies
+├── CHECKPOINT.md               # Project progress and version history
+├── data/                       # Dataset directory
+│   └── images/                 # Image data for training and testing
+├── models/                     # Saved model weights and metrics
+│   ├── coatnet_0_best.pth      # CoAtNet model weights
+│   ├── efficientnet_b0_best.pth # EfficientNet model weights
+│   ├── swin_transformer_tiny_best.pth # Swin Transformer model weights
+│   ├── yolov10_small_best.pth  # YOLO model weights
+│   └── ensemble_metrics.txt    # Performance metrics for the ensemble
+├── results/                    # Evaluation results and visualizations
+│   └── ensemble_confusion_matrix.png # Confusion matrix for the ensemble model
+├── src/                        # Source code
+│   ├── config.yaml             # Configuration parameters
+│   ├── data/                   # Data loading and preprocessing
+│   │   ├── deepfake_dataset.py # Basic dataset implementation
+│   │   └── loader.py           # Enhanced data loader with augmentation
+│   ├── inference/              # Inference utilities
+│   │   └── predict.py          # Functions for model inference
+│   ├── models/                 # Model architectures
+│   │   ├── coatnet.py          # CoAtNet implementation
+│   │   ├── efficientnetv2.py   # EfficientNetV2 implementation
+│   │   ├── swin_transformer.py # Swin Transformer implementation
+│   │   └── yolov10.py          # YOLO implementation
+│   └── train/                  # Training utilities
+│       └── train.py            # Training functions and loops
+├── static/                     # Static assets for the web application
+│   └── team member images      # Team member profile pictures
+└── templates/                  # HTML templates for the web application
+    └── index.html              # Main web interface
 ```
+
+## Key Features
+
+- **Multi-Model Ensemble**: Combines EfficientNet, CoAtNet, Swin Transformer, and YOLO architectures with optimized weights
+- **Adaptive Thresholding**: Uses different decision thresholds based on prediction confidence levels
+- **Test-Time Augmentation**: Improves robustness by combining predictions from original and flipped images
+- **Web Interface**: User-friendly Flask application for uploading and analyzing images
+- **Detailed Reports**: Provides prediction results with confidence scores and downloadable PDF reports
+- **Advanced Data Augmentation**: Implements techniques like MixUp, random rotations, and color jittering during training
 
 ## Installation
 
-1. Clone this repository:
-```
-git clone https://github.com/username/deepfake-detection.git
-cd deepfake-detection
-```
+```bash
+# Clone the repository
+git clone https://github.com/Vivekbari16/capstone.git
+cd capstone
 
-2. Install the required packages:
-```
+# Create a virtual environment (optional but recommended)
+python -m venv venv
+
+# Activate the virtual environment
+# On Windows
+venv\Scripts\activate
+# On macOS/Linux
+# source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-3. Install additional dependencies for the state-of-the-art models:
-```
-pip install timm albumentations ultralytics optuna
-```
-
-## Dataset
-
-The dataset is organized as follows:
-- `data/images/real/`: Contains real face images
-- `data/images/fake/`: Contains fake face images, with filenames prefixed by difficulty level:
-  - `easy_*.jpg`: Easier to detect fakes
-  - `mid_*.jpg`: Medium difficulty fakes
-  - `hard_*.jpg`: Harder to detect fakes
-- `data/videos/`: Contains video files for testing
-
 ## Usage
 
-### Training Models
+### Web Application
 
-To train the different models, run the following scripts:
+To run the web application for interactive DeepFake detection:
 
-```
-# Train Swin Transformer V2 model
-python train_swin.py
-
-# Train CoAtNet model
-python train_coatnet.py
-
-# Train EfficientNetV2 model
-python train_efficientnetv2.py
-
-# Train YOLOv10 model
-python train_yolov10.py
-
-# Create and evaluate ensemble model (requires all models above)
-python train_ensemble.py
+```bash
+python app.py
 ```
 
-You can customize the training process with command-line arguments:
+This will start a Flask server on http://localhost:5000. Open this URL in your web browser to access the DeepFake detection interface.
 
-```
-python train_swin.py --model_size tiny --batch_size 16 --lr 1e-4 --epochs 20
-```
+### Command Line Inference
 
-For hyperparameter tuning:
+To analyze a single image from the command line:
 
-```
-python src/tune_hyperparams.py --config src/config.yaml --n_trials 50
+```bash
+python src/inference/predict.py path/to/image.jpg
 ```
 
-### Analyzing Model Performance
+## Model Architecture
 
-To analyze model performance on different difficulty levels:
+Our system uses a weighted ensemble of four state-of-the-art deep learning models:
 
-```
-python src/evaluate.py --model swin_transformer_tiny --analyze_difficulty
-```
+1. **EfficientNet-B0**: Optimized convolutional neural network with balanced depth, width, and resolution scaling.
+2. **CoAtNet**: Hybrid model combining convolution and self-attention mechanisms for improved feature extraction.
+3. **Swin Transformer**: Hierarchical vision transformer with shifted windows for efficient attention computation.
+4. **YOLOv10**: Adapted from the YOLO object detection architecture, providing fast and accurate feature extraction.
 
-To compare all models:
+The ensemble combines these models with optimized weights:
+- EfficientNet: 1.57
+- CoAtNet: 1.06
+- Swin Transformer: 0.41
+- YOLO: 0.97
 
-```
-python src/evaluate.py
-```
-
-To optimize ensemble weights:
-
-```
-python train_ensemble.py --ensemble_type weighted --optimize
-```
-
-To perform grid search for optimal ensemble weights:
-
-```
-python train_ensemble.py --ensemble_type weighted --grid_search
-```
-
-### Inference
-
-For batch processing of images:
-
-```
-python batch_image_detection.py --image_dir path/to/images --model ensemble --output results.csv
-```
-
-For video processing:
-
-```
-python video_detection.py --video path/to/video.mp4 --model ensemble --output processed_video.avi
-```
-
-### GUI Application
-
-To use the graphical user interface:
-
-```
-python demo_app.py
-```
-
-## Model Architectures
-
-The system includes the following state-of-the-art model architectures:
-
-1. **Swin Transformer V2**: A hierarchical vision transformer with shifted windows for efficient attention computation
-2. **CoAtNet**: A hybrid model that combines convolution and self-attention for improved performance
-3. **EfficientNetV2**: An improved version of EfficientNet with better parameter efficiency and accuracy
-4. **YOLOv10**: A backbone from the YOLO object detection architecture adapted for binary classification
-5. **Weighted Ensemble**: An optimized ensemble that combines predictions from multiple models with learned weights
-
-We also include the previous generation models for comparison:
-- **Xception**: A custom Xception-like architecture with separable convolutions
-- **ResNet50**: A pre-trained ResNet50 model with a custom classification head
-- **EfficientNet-B3**: A pre-trained EfficientNet-B3 model with a custom classification head
+The system also employs adaptive thresholding based on confidence levels, with different thresholds for high, medium, and low confidence predictions.
 
 ## Performance
 
-The models are evaluated on metrics such as:
-- Accuracy
-- Precision and Recall
-- F1 Score
-- ROC curves and AUC
-- Precision-Recall curves
+Our ensemble model achieves the following performance metrics on the test dataset:
 
-Results are saved in the `results/` directory.
+| Metric    | Score |
+|-----------|-------|
+| Accuracy  | 87%   |
+| Precision | 88%   |
+| Recall    | 86%   |
+| F1-Score  | 87%   |
+| ROC-AUC   | 92%   |
+
+## Team
+
+- **Bari Vivek Yadav** - Team Lead & Data Scientist
+- **A Srinivas Kasyap** - Machine Learning Engineer
+- **R Sai Sumanth** - Full Stack Developer
+- **Mrudula Selokar** - Mentor
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Thanks to the PyTorch team for their excellent deep learning framework
+- The implementation of various model architectures was inspired by research papers and open-source implementations
+- Special thanks to our mentor for guidance throughout the project
+
+
+
 
 ## License
 
